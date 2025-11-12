@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "db:start": "docker-compose up -d",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",

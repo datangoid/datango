@@ -32,6 +32,7 @@
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
+    "db:start": "turbo -F @datango/db db:start",
     "db:push": "turbo -F @datango/db db:push",
     "db:studio": "turbo -F @datango/db db:studio",
     "db:generate": "turbo -F @datango/db db:generate",
