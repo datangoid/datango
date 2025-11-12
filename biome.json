@@ -25,6 +25,12 @@
     ]
   },
   "extends": ["ultracite/core", "ultracite/react"],
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80
+  },
   "linter": {
     "rules": {
       "performance": {
