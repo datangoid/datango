@@ -1,4 +1,6 @@
-import { auth } from "@datango/auth";
+import { env } from "cloudflare:workers";
+import { createAuth } from "@datango/auth";
+import { createDbClient } from "@datango/db";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {
@@ -6,6 +8,7 @@ export type CreateContextOptions = {
 };
 
 export async function createContext({ context }: CreateContextOptions) {
+  const auth = createAuth(createDbClient(env.DATABASE.connectionString));
   const session = await auth.api.getSession({
     headers: context.req.raw.headers,
   });

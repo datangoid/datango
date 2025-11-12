@@ -1,10 +1,16 @@
-import { env } from "cloudflare:workers";
-import { neon, neonConfig } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import ws from "ws";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema/index";
 
-neonConfig.webSocketConstructor = ws;
-neonConfig.poolQueryViaFetch = true;
+export function createDbClient(
+  connectionString: string
+): PostgresJsDatabase<typeof schema> {
+  const client = postgres(connectionString, {
+    max: 5,
+    fetch_types: false,
+  });
 
-const sql = neon(env.DATABASE_URL || "");
-export const db = drizzle(sql);
+  return drizzle(client, { schema });
+}
+
+export type DrizzleClient = ReturnType<typeof createDbClient>;

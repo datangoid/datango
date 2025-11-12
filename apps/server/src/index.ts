@@ -1,7 +1,8 @@
 import { env } from "cloudflare:workers";
 import { createContext } from "@datango/api/context";
 import { appRouter } from "@datango/api/routers/index";
-import { auth } from "@datango/auth";
+import { createAuth } from "@datango/auth";
+import { createDbClient } from "@datango/db";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
@@ -24,7 +25,10 @@ app.use(
   })
 );
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/*", (c) => {
+  const auth = createAuth(createDbClient(env.DATABASE.connectionString));
+  return auth.handler(c.req.raw);
+});
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [

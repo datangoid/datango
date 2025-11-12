@@ -20,7 +20,8 @@
       "!**/.svelte-kit",
       "!**/wrangler.jsonc",
       "!**/.source",
-      "!**/*.d.ts"
+      "!**/*.d.ts",
+      "!**/migrations/*"
     ]
   },
   "extends": ["ultracite/core", "ultracite/react"],
@@ -38,7 +39,8 @@
       },
       "style": {
         "noNestedTernary": "off",
-        "useConsistentTypeDefinitions": "off"
+        "useConsistentTypeDefinitions": "off",
+        "noNonNullAssertion": "off"
       }
     }
   }
