@@ -47,7 +47,12 @@ export const createAuth = (db: DrizzleClient) =>
       },
       crossSubDomainCookies: {
         enabled: env.ALCHEMY_STAGE === "prod" || env.ALCHEMY_STAGE === "staging",
-        domain: env.ALCHEMY_STAGE === "prod" ? "datango.id" : "staging.datango.id",
+        domain:
+          env.ALCHEMY_STAGE === "prod"
+            ? "app.datango.id"
+            : env.ALCHEMY_STAGE === "staging"
+              ? "staging.app.datango.id"
+              : "preview.app.datango.id",
       },
     },
   });
