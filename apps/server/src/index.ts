@@ -37,6 +37,15 @@ const rpcHandler = new RPCHandler(appRouter, {
 
 app.use(logger());
 
+// Debug: Log environment variables
+console.log("Environment Check:", {
+  STAGE: env.STAGE,
+  CORS_ORIGIN: env.CORS_ORIGIN,
+  BETTER_AUTH_URL: env.BETTER_AUTH_URL,
+  HAS_DATABASE: !!env.DATABASE,
+  HAS_SESSIONS_KV: !!env.SESSIONS_KV,
+});
+
 // Global CORS for all routes
 app.use(
   "/*",
