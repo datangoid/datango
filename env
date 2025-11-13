@@ -1,6 +1,6 @@
 ALCHEMY_STAGE="dev"
 
-# This password used to encrypt your secrets ( alchemy.secret.env.* files )
+# This password used to encrypt this project secrets ( alchemy.secret.env.* files )
 # openssl rand -base64 24
 ALCHEMY_PASSWORD=""
 

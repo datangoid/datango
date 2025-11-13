@@ -1,0 +1,82 @@
+# Workflow untuk deploy aplikasi Datango ke environment Staging
+name: Deploy Datango Staging
+
+# Trigger: workflow ini akan berjalan otomatis saat ada push ke branch staging
+on:
+  push:
+    branches:
+      - staging
+
+# Concurrency control: mencegah deployment paralel pada ref yang sama
+# Ini memastikan hanya satu deployment yang berjalan pada satu waktu
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-staging-job:
+    # Validasi: pastikan ini adalah push ke staging branch
+    if: ${{ github.ref == 'refs/heads/staging' && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    environment: staging # Menggunakan environment 'staging' untuk secrets & approvals
+    permissions:
+      contents: read # Permission minimal yang dibutuhkan
+    
+    steps:
+      # Step 1: Checkout kode dari repository
+      - uses: actions/checkout@v4
+      
+      # Step 2: Setup Bun runtime untuk build & deployment
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      
+      # Step 3: Install semua dependencies yang dibutuhkan project
+      - name: Install dependencies
+        run: bun install
+      
+      # Step 4: Buat file environment untuk staging
+      # File ini berisi konfigurasi khusus staging yang akan digunakan saat build & deploy
+      - name: Create environment files
+        run: |
+          # Environment file root untuk Alchemy deployment
+          cat > .env.staging << EOF
+          ALCHEMY_STAGE=staging
+          EOF
+
+          # Environment file untuk aplikasi web (frontend)
+          cat > apps/web/.env.staging << EOF
+          VITE_SERVER_URL=${{ vars.VITE_SERVER_URL }}
+          VITE_WEB_URL=${{ vars.VITE_WEB_URL }}
+          CUSTOM_WEB_DOMAIN=${{ vars.CUSTOM_WEB_DOMAIN }}
+          EOF
+
+          # Environment file untuk aplikasi server (backend)
+          cat > apps/server/.env.staging << EOF
+          CORS_ORIGIN=${{ vars.CORS_ORIGIN }}
+          BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }}
+          API_CUSTOM_DOMAIN=${{ vars.API_CUSTOM_DOMAIN }}
+          API_ROUTE_PATTERN=${{ vars.API_ROUTE_PATTERN }}
+          EOF
+      
+      # Step 5: Jalankan migrasi database
+      # Ini memastikan schema database sesuai dengan kode terbaru sebelum deployment
+      - name: Migrate Database
+        run: |
+          cd packages/db
+          bun run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
+      # Step 6: Deploy aplikasi ke staging menggunakan Alchemy
+      # Semua secrets & environment variables yang dibutuhkan di-inject di sini
+      - name: Deploy Website
+        run: bun alchemy deploy --stage staging
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+          ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

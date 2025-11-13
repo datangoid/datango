@@ -4,10 +4,7 @@ import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
 
 const app = await alchemy("datango", {
-  stateStore: (scope) =>
-    new CloudflareStateStore(scope, {
-      stateToken: alchemy.secret.env.ALCHEMY_STATE_TOKEN,
-    }),
+  stateStore: (scope) => new CloudflareStateStore(scope),
 });
 
 const stage = app.stage;
@@ -15,6 +12,16 @@ const stage = app.stage;
 config({
   path: [`./.env.${stage}`, `./apps/web/.env.${stage}`, `./apps/server/.env.${stage}`],
 });
+
+// Create a Neon branch for pull requests (WARNING: Experimental feature)
+// if (process.env.PULL_REQUEST) {
+//   const branch = await NeonBranch("neon-branch", {
+//     name: `preview-pr-${process.env.PULL_REQUEST}`,
+//     project: app.name,
+//     parentBranch: "development",
+//     endpoints: [{ type: "read_write" }],
+//   });
+// }
 
 const db = await Hyperdrive("database", {
   name: `${app.name}-${stage}-db`,
