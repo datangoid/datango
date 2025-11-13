@@ -20,6 +20,7 @@ export const createAuth = (db: DrizzleClient) =>
         maxAge: 60,
       },
     },
+    basePath: "/v1/auth",
     secondaryStorage: {
       get: async (key) => {
         const value = await env.SESSIONS_KV.get(key);

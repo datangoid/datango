@@ -12,25 +12,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-const app = new Hono();
+const app = new Hono<{ Bindings: Env }>();
 
-app.use(logger());
-app.use(
-  "/*",
-  cors({
-    origin: env.CORS_ORIGIN || "",
-    allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-app.on(["POST", "GET"], "/api/auth/*", (c) => {
-  const auth = createAuth(createDbClient(env.DATABASE.connectionString));
-  return auth.handler(c.req.raw);
-});
-
-export const apiHandler = new OpenAPIHandler(appRouter, {
+const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
     new OpenAPIReferencePlugin({
       schemaConverters: [new ZodToJsonSchemaConverter()],
@@ -43,7 +27,7 @@ export const apiHandler = new OpenAPIHandler(appRouter, {
   ],
 });
 
-export const rpcHandler = new RPCHandler(appRouter, {
+const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error) => {
       console.error(error);
@@ -51,25 +35,45 @@ export const rpcHandler = new RPCHandler(appRouter, {
   ],
 });
 
-app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
+app.use(logger());
 
+app.use(
+  "/*",
+  cors({
+    origin: env.CORS_ORIGIN || "http://localhost:3001",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "User-Agent"],
+    credentials: true,
+  })
+);
+
+app.on(["POST", "GET"], "/v1/auth/*", (c) => {
+  const auth = createAuth(createDbClient(env.DATABASE.connectionString));
+  return auth.handler(c.req.raw);
+});
+
+app.use("/v1/*", async (c, next) => {
+  const context = await createContext({ context: c });
   const rpcResult = await rpcHandler.handle(c.req.raw, {
-    prefix: "/rpc",
+    prefix: "/v1",
     context,
   });
 
-  if (rpcResult.matched) {
+  if (rpcResult.matched && rpcResult.response) {
     return c.newResponse(rpcResult.response.body, rpcResult.response);
   }
 
-  const apiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/api-reference",
+  await next();
+});
+app.use("/openapi/*", async (c, next) => {
+  const context = await createContext({ context: c });
+  const openapiResult = await apiHandler.handle(c.req.raw, {
+    prefix: "/api/openapi",
     context,
   });
 
-  if (apiResult.matched) {
-    return c.newResponse(apiResult.response.body, apiResult.response);
+  if (openapiResult.matched && openapiResult.response) {
+    return c.newResponse(openapiResult.response.body, openapiResult.response);
   }
 
   await next();
