@@ -55,12 +55,6 @@ export const server = await Worker("server", {
     BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET as unknown as string,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL as string,
   },
-  routes: [
-    {
-      pattern: alchemy.env.API_ROUTE_PATTERN as string,
-      adopt: true,
-    },
-  ],
   domains: [alchemy.env.API_CUSTOM_DOMAIN as string],
   dev: {
     port: 3000,
