@@ -1,1 +1,17 @@
-ALCHEMY_PASSWORD=
+ALCHEMY_STAGE="dev"
+
+# This password used to encrypt your secrets ( alchemy.secret.env.* files )
+# openssl rand -base64 24
+ALCHEMY_PASSWORD=""
+
+# This token used to auth with your state store worker (so a bad actor can't hit your alchemy-state-service worker's endpoint and mess with your state)
+# openssl rand -base64 32
+ALCHEMY_STATE_TOKEN=""
+
+
+# NAME THIS FILE INTO .env.dev
+
+# JUST ADD THIS ON GITHUB ACTIONS SECRETS
+# CLOUDFLARE_EMAIL=""
+# CLOUDFLARE_ACCOUNT_ID=""
+# CLOUDFLARE_API_TOKEN="-PtGAi5N"

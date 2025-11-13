@@ -1,4 +1,17 @@
-DATABASE_URL=
-BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=
-CORS_ORIGIN=
+# RENAME THIS FILE INTO .env (for bun run dev)
+# AND DUPLICATE IT WITH NAME .env.dev (for bun alchemy dev)
+
+# FOR GENERATE SECRET = https://www.better-auth.com/docs/installation#set-environment-variables
+BETTER_AUTH_SECRET=""
+# BACK END / API URL
+BETTER_AUTH_URL="http://localhost:3000"
+
+# FOR DEVELOPMENT. YOU CAN RUN db:start AND USE THIS VARIABLE
+DATABASE_URL="postgres://postgres:postgres@localhost:5432/datango"
+
+# FRONT END WEB
+CORS_ORIGIN="http://localhost:3001"
+
+# THIS VARIABLE JUST FOR DEPLOYMENT
+API_ROUTE_PATTERN="api.example.com/v1/*"
+API_CUSTOM_DOMAIN="api.example.com"

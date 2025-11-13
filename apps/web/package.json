@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate-pwa-assets": "pwa-assets-generator",
+    "check-types": "tsc --noEmit",
+
+    "adev": "vite --port=3001",
+    "aclean": "rm -rf .alchemy",
+
     "dev": "vite --port=3001",
-    "deva": "vite --port=3001",
     "build": "vite build",
     "serve": "vite preview",
-    "start": "vite",
-    "check-types": "tsc --noEmit",
-    "generate-pwa-assets": "pwa-assets-generator"
+    "start": "vite"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

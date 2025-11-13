@@ -3,13 +3,14 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
+    "check-types": "tsc -b",
+
+    "adev": "alchemy dev",
+    "aclean": "rm -rf .alchemy .wrangler",
+
     "dev": "wrangler dev --port=3000",
     "build": "tsdown",
-    "check-types": "tsc -b",
-    "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
-    "deva": "alchemy dev",
-    "deploy": "alchemy deploy",
-    "destroy": "alchemy destroy"
+    "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
   },
   "dependencies": {
     "hono": "catalog:",

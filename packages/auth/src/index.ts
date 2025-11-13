@@ -16,7 +16,7 @@ export const createAuth = (db: DrizzleClient) =>
     },
     session: {
       cookieCache: {
-        enabled: env.STAGE === "prod",
+        enabled: env.ALCHEMY_STAGE === "prod",
         maxAge: 60,
       },
     },
@@ -46,8 +46,8 @@ export const createAuth = (db: DrizzleClient) =>
         httpOnly: true,
       },
       crossSubDomainCookies: {
-        enabled: env.STAGE === "prod" || env.STAGE === "staging",
-        domain: env.STAGE === "prod" ? "datango.id" : "staging.datango.id",
+        enabled: env.ALCHEMY_STAGE === "prod" || env.ALCHEMY_STAGE === "staging",
+        domain: env.ALCHEMY_STAGE === "prod" ? "datango.id" : "staging.datango.id",
       },
     },
   });

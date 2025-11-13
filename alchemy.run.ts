@@ -47,7 +47,6 @@ export const server = await Worker("server", {
     enabled: true,
   },
   bindings: {
-    STAGE: stage,
     DATABASE: db,
     SESSIONS_KV: sessions,
     ALCHEMY_STAGE: alchemy.env.ALCHEMY_STAGE as string,
@@ -79,11 +78,11 @@ export const web = await Vite("web", {
 });
 
 if (stage === "prod" || stage === "staging") {
-  const customDomain = alchemy.env.CUSTOM_WEB_DOMAIN as string;
+  const webDomain = alchemy.env.CUSTOM_WEB_DOMAIN as string;
   const apiPattern = alchemy.env.API_ROUTE_PATTERN as string;
 
   console.log(`\nDeployed to ${stage} via Alchemy:`);
-  console.log(`   Web     -> https://${customDomain}`);
+  console.log(`   Web     -> https://${webDomain}`);
   console.log(`   API     -> https://${apiPattern.replace("/*", "")}`);
 }
 

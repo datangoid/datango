@@ -31,7 +31,8 @@
     "check": "bun run lint && bun run format",
     "check-types": "turbo check-types",
 
-    "deva": "alchemy dev --env-file .env.dev",
+    "adev": "alchemy dev --env-file .env.dev",
+    "aclean": "rm -rf .alchemy && turbo aclean",
 
     "build": "turbo build",
     "dev": "turbo dev",
