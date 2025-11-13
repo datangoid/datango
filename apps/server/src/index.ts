@@ -12,7 +12,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env }>().basePath("/v1");
 
 const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
@@ -47,12 +47,12 @@ app.use(
   })
 );
 
-app.on(["POST", "GET"], "/v1/auth/*", (c) => {
+app.on(["POST", "GET"], "/auth/*", (c) => {
   const auth = createAuth(createDbClient(env.DATABASE.connectionString));
   return auth.handler(c.req.raw);
 });
 
-app.use("/v1/*", async (c, next) => {
+app.use("/*", async (c, next) => {
   const context = await createContext({ context: c });
   const rpcResult = await rpcHandler.handle(c.req.raw, {
     prefix: "/v1",
@@ -68,7 +68,7 @@ app.use("/v1/*", async (c, next) => {
 app.use("/openapi/*", async (c, next) => {
   const context = await createContext({ context: c });
   const openapiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/api/openapi",
+    prefix: "/v1/openapi",
     context,
   });
 

@@ -33,16 +33,34 @@ const sessions = await KVNamespace("kv", {
 
 export const server = await Worker("server", {
   cwd: "apps/server",
+  name: `${app.name}-${stage}-api`,
   entrypoint: "src/index.ts",
   compatibility: "node",
+  adopt: true,
+  url: false,
+  bundle: {
+    loader: {
+      ".sql": "text",
+    },
+  },
+  observability: {
+    enabled: true,
+  },
   bindings: {
     STAGE: stage,
     DATABASE: db,
     SESSIONS_KV: sessions,
+    ALCHEMY_STAGE: alchemy.env.ALCHEMY_STAGE as string,
     CORS_ORIGIN: alchemy.env.CORS_ORIGIN as string,
     BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET as unknown as string,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL as string,
   },
+  routes: [
+    {
+      pattern: alchemy.env.API_ROUTE_PATTERN as string,
+      adopt: true,
+    },
+  ],
   dev: {
     port: 3000,
   },
@@ -50,14 +68,29 @@ export const server = await Worker("server", {
 
 export const web = await Vite("web", {
   cwd: "apps/web",
+  name: `${app.name}-${stage}-web`,
   assets: "dist",
+  url: false,
+  adopt: true,
   bindings: {
+    ALCHEMY_STAGE: alchemy.env.ALCHEMY_STAGE as string,
     VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL as string,
+    VITE_WEB_URL: alchemy.env.VITE_WEB_URL as string,
   },
   dev: {
     command: "bun run dev",
   },
+  domains: [alchemy.env.CUSTOM_WEB_DOMAIN as string],
 });
+
+if (stage === "prod" || stage === "staging") {
+  const customDomain = alchemy.env.CUSTOM_WEB_DOMAIN as string;
+  const apiPattern = alchemy.env.API_ROUTE_PATTERN as string;
+
+  console.log(`\nDeployed to ${stage} via Alchemy:`);
+  console.log(`   Web     -> https://${customDomain}`);
+  console.log(`   API     -> https://${apiPattern.replace("/*", "")}`);
+}
 
 // Run this to generate wrangler.json files for local development
 // Then you can run bun run dev.
@@ -68,8 +101,5 @@ export const web = await Vite("web", {
 //     worker: server,
 //   });
 // }
-
-console.log(`Web -> ${web.url}`);
-console.log(`API -> ${server.url}`);
 
 await app.finalize();
