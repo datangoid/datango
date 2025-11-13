@@ -14,13 +14,28 @@ export const createAuth = (db: DrizzleClient) =>
     emailAndPassword: {
       enabled: true,
     },
-    // uncomment cookieCache setting when ready to deploy to Cloudflare using *.workers.dev domains
-    // session: {
-    //   cookieCache: {
-    //     enabled: true,
-    //     maxAge: 60,
-    //   },
-    // },
+    session: {
+      cookieCache: {
+        enabled: env.STAGE === "prod",
+        maxAge: 60,
+      },
+    },
+    secondaryStorage: {
+      get: async (key) => {
+        const value = await env.SESSIONS_KV.get(key);
+        return value;
+      },
+      set: async (key, value, ttl) => {
+        if (ttl) {
+          await env.SESSIONS_KV.put(key, value, { expirationTtl: ttl });
+        } else {
+          await env.SESSIONS_KV.put(key, value);
+        }
+      },
+      delete: async (key) => {
+        await env.SESSIONS_KV.delete(key);
+      },
+    },
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     advanced: {
@@ -29,12 +44,10 @@ export const createAuth = (db: DrizzleClient) =>
         secure: true,
         httpOnly: true,
       },
-      // uncomment crossSubDomainCookies setting when ready to deploy and replace <your-workers-subdomain> with your actual workers subdomain
-      // https://developers.cloudflare.com/workers/wrangler/configuration/#workersdev
-      // crossSubDomainCookies: {
-      //   enabled: true,
-      //   domain: "<your-workers-subdomain>",
-      // },
+      crossSubDomainCookies: {
+        enabled: env.STAGE === "prod" || env.STAGE === "staging",
+        domain: env.STAGE === "prod" ? "datango.id" : "staging.datango.id",
+      },
     },
   });
 

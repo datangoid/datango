@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { Hyperdrive, Vite, Worker, WranglerJson } from "alchemy/cloudflare";
+import { Hyperdrive, KVNamespace, Vite, Worker } from "alchemy/cloudflare";
 import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
 
@@ -26,12 +26,19 @@ const db = await Hyperdrive("database", {
   },
 });
 
+const sessions = await KVNamespace("kv", {
+  title: `${app.name}-${stage}-user-sessions`,
+  adopt: true,
+});
+
 export const server = await Worker("server", {
   cwd: "apps/server",
   entrypoint: "src/index.ts",
   compatibility: "node",
   bindings: {
+    STAGE: stage,
     DATABASE: db,
+    SESSIONS_KV: sessions,
     CORS_ORIGIN: alchemy.env.CORS_ORIGIN as string,
     BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET as unknown as string,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL as string,
@@ -52,11 +59,15 @@ export const web = await Vite("web", {
   },
 });
 
-if (stage === "dev") {
-  await WranglerJson({
-    worker: server,
-  });
-}
+// Run this to generate wrangler.json files for local development
+// Then you can run bun run dev.
+// Dont forget to set your local database connection string in the wrangler.json files!
+// After that you can comment this out again.
+// if (stage === "dev") {
+//   await WranglerJson({
+//     worker: server,
+//   });
+// }
 
 console.log(`Web -> ${web.url}`);
 console.log(`API -> ${server.url}`);

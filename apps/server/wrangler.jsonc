@@ -7,13 +7,22 @@
     "nodejs_compat_populate_process_env"
   ],
   "vars": {
+    "STAGE": "dev",
     "CORS_ORIGIN": "http://localhost:3001",
     "BETTER_AUTH_URL": "http://localhost:3000"
   },
+  "kv_namespaces": [
+    {
+      "binding": "SESSIONS_KV",
+      "id": "kv",
+      "preview_id": "kv"
+    }
+  ],
   "hyperdrive": [
     {
       "binding": "DATABASE",
-      "id": ""
+      "id": "",
+      "localConnectionString":"postgres://postgres:postgres@localhost:5432/datango"
     }
   ]
 }
