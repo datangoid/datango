@@ -61,6 +61,7 @@ export const server = await Worker("server", {
       adopt: true,
     },
   ],
+  domains: [alchemy.env.BETTER_AUTH_URL as string],
   dev: {
     port: 3000,
   },
