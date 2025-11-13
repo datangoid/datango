@@ -24,22 +24,25 @@
     }
   },
   "scripts": {
-    "check": "biome check --write .",
     "prepare": "husky",
-    "a:dev": "alchemy dev --env-file .env.dev",
-    "dev": "alchemy dev",
-    "build": "turbo build",
+    "lint": "biome check --write .",
+    "format": "biome format --write .",
+    "format:unsafe": "biome format --write --unsafe .",
+    "check": "bun run lint && bun run format",
     "check-types": "turbo check-types",
-    "dev:native": "turbo -F native dev",
+
+    "deva": "alchemy dev --env-file .env.dev",
+
+    "build": "turbo build",
+    "dev": "turbo dev",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
+
     "db:start": "turbo -F @datango/db db:start",
     "db:push": "turbo -F @datango/db db:push",
     "db:studio": "turbo -F @datango/db db:studio",
     "db:generate": "turbo -F @datango/db db:generate",
-    "db:migrate": "turbo -F @datango/db db:migrate",
-    "deploy": "alchemy deploy",
-    "destroy": "alchemy destroy"
+    "db:migrate": "turbo -F @datango/db db:migrate"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

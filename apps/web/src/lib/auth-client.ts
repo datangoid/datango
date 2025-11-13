@@ -1,8 +1,8 @@
-import type { auth } from "@datango/auth";
+import type { createAuth } from "@datango/auth";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_SERVER_URL,
-  plugins: [inferAdditionalFields<typeof auth>()],
+  plugins: [inferAdditionalFields<typeof createAuth>()],
 });

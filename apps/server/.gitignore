@@ -15,11 +15,12 @@ dist/
 .idea/workspace.xml
 .idea/usage.statistics.xml
 .idea/shelf
-.wrangler
+.wrangler*
 .alchemy
 /.next/
 .vercel
 prisma/generated/
+
 
 
 # deps

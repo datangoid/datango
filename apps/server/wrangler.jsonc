@@ -1,0 +1,19 @@
+{
+  "name": "datango-server-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-11-11",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
+  ],
+  "vars": {
+    "CORS_ORIGIN": "http://localhost:3001",
+    "BETTER_AUTH_URL": "http://localhost:3000"
+  },
+  "hyperdrive": [
+    {
+      "binding": "DATABASE",
+      "id": ""
+    }
+  ]
+}

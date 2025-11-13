@@ -23,16 +23,11 @@ export const todoRouter = {
     .input(z.object({ id: z.number(), completed: z.boolean() }))
     .handler(async ({ input }) => {
       const db = createDbClient(env.DATABASE.connectionString);
-      return await db
-        .update(todo)
-        .set({ completed: input.completed })
-        .where(eq(todo.id, input.id));
+      return await db.update(todo).set({ completed: input.completed }).where(eq(todo.id, input.id));
     }),
 
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .handler(async ({ input }) => {
-      const db = createDbClient(env.DATABASE.connectionString);
-      return await db.delete(todo).where(eq(todo.id, input.id));
-    }),
+  delete: publicProcedure.input(z.object({ id: z.number() })).handler(async ({ input }) => {
+    const db = createDbClient(env.DATABASE.connectionString);
+    return await db.delete(todo).where(eq(todo.id, input.id));
+  }),
 };

@@ -11,9 +11,7 @@ const router = createRouter({
   defaultPendingComponent: () => <Loader />,
   context: { orpc, queryClient },
   Wrap({ children }: { children: React.ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   },
 });
 

@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { Hyperdrive, Vite, Worker } from "alchemy/cloudflare";
+import { Hyperdrive, Vite, Worker, WranglerJson } from "alchemy/cloudflare";
 import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
 
@@ -13,11 +13,7 @@ const app = await alchemy("datango", {
 const stage = app.stage;
 
 config({
-  path: [
-    `./.env.${stage}`,
-    `./apps/web/.env.${stage}`,
-    `./apps/server/.env.${stage}`,
-  ],
+  path: [`./.env.${stage}`, `./apps/web/.env.${stage}`, `./apps/server/.env.${stage}`],
 });
 
 const db = await Hyperdrive("database", {
@@ -37,8 +33,7 @@ export const server = await Worker("server", {
   bindings: {
     DATABASE: db,
     CORS_ORIGIN: alchemy.env.CORS_ORIGIN as string,
-    BETTER_AUTH_SECRET: alchemy.secret.env
-      .BETTER_AUTH_SECRET as unknown as string,
+    BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET as unknown as string,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL as string,
   },
   dev: {
@@ -57,7 +52,13 @@ export const web = await Vite("web", {
   },
 });
 
-console.log(`Web    -> ${web.url}`);
+if (stage === "dev") {
+  await WranglerJson({
+    worker: server,
+  });
+}
+
+console.log(`Web -> ${web.url}`);
 console.log(`API -> ${server.url}`);
 
 await app.finalize();

@@ -12,12 +12,12 @@
     }
   },
   "scripts": {
-    "build": "tsdown",
     "db:start": "docker-compose up -d",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "build": "tsdown"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.2",
