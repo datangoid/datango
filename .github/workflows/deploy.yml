@@ -44,6 +44,7 @@ jobs:
           cat > apps/server/.env.prod << EOF
           CORS_ORIGIN=${{ vars.CORS_ORIGIN }}
           BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }}
+          API_CUSTOM_DOMAIN=${{ vars.API_CUSTOM_DOMAIN }}
           API_ROUTE_PATTERN=${{ vars.API_ROUTE_PATTERN }}
           EOF
       - name: Migrate Database
@@ -91,6 +92,7 @@ jobs:
           cat > apps/server/.env.staging << EOF
           CORS_ORIGIN=${{ vars.CORS_ORIGIN }}
           BETTER_AUTH_URL=${{ vars.BETTER_AUTH_URL }}
+          API_CUSTOM_DOMAIN=${{ vars.API_CUSTOM_DOMAIN }}
           API_ROUTE_PATTERN=${{ vars.API_ROUTE_PATTERN }}
           EOF
       - name: Migrate Database
