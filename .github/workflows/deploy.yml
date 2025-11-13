@@ -47,7 +47,9 @@ jobs:
           API_ROUTE_PATTERN=${{ vars.API_ROUTE_PATTERN }}
           EOF
       - name: Migrate Database
-        run: bun db:migrate
+        run: |
+          cd packages/db
+          bun run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Deploy to Production
@@ -92,7 +94,9 @@ jobs:
           API_ROUTE_PATTERN=${{ vars.API_ROUTE_PATTERN }}
           EOF
       - name: Migrate Database
-        run: bun db:migrate
+        run: |
+          cd packages/db
+          bun run db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Deploy to Staging

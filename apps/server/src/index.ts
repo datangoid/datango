@@ -37,34 +37,26 @@ const rpcHandler = new RPCHandler(appRouter, {
 
 app.use(logger());
 
+// Global CORS for all routes
 app.use(
   "/*",
   cors({
     origin: env.CORS_ORIGIN || "http://localhost:3001",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization", "User-Agent"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
     credentials: true,
   })
 );
 
+// AUTH ROUTES
 app.on(["POST", "GET"], "/auth/*", (c) => {
   const auth = createAuth(createDbClient(env.DATABASE.connectionString));
   return auth.handler(c.req.raw);
 });
 
-app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
-  const rpcResult = await rpcHandler.handle(c.req.raw, {
-    prefix: "/v1",
-    context,
-  });
-
-  if (rpcResult.matched && rpcResult.response) {
-    return c.newResponse(rpcResult.response.body, rpcResult.response);
-  }
-
-  await next();
-});
+// OPENAPI ROUTES
 app.use("/openapi/*", async (c, next) => {
   const context = await createContext({ context: c });
   const openapiResult = await apiHandler.handle(c.req.raw, {
@@ -74,6 +66,21 @@ app.use("/openapi/*", async (c, next) => {
 
   if (openapiResult.matched && openapiResult.response) {
     return c.newResponse(openapiResult.response.body, openapiResult.response);
+  }
+
+  await next();
+});
+
+// RPC ROUTES
+app.use("/*", async (c, next) => {
+  const context = await createContext({ context: c });
+  const rpcResult = await rpcHandler.handle(c.req.raw, {
+    prefix: "/v1",
+    context,
+  });
+
+  if (rpcResult.matched && rpcResult.response) {
+    return c.newResponse(rpcResult.response.body, rpcResult.response);
   }
 
   await next();
