@@ -1,71 +1,19 @@
-import { env } from "cloudflare:workers";
 import type { DrizzleClient } from "@datango/db";
 import * as schema from "@datango/db/schema/auth";
-import { betterAuth } from "better-auth";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { getAuthConfig } from "./auth-config";
 
-let customCookiePrefix: string;
-switch (env.ALCHEMY_STAGE) {
-  case "prod":
-    customCookiePrefix = "datango_";
-    break;
-  case "staging":
-    customCookiePrefix = "datango_staging_";
-    break;
-  case "dev":
-    customCookiePrefix = "datango_dev_";
-    break;
-  default:
-    customCookiePrefix = "datango_preview_";
-}
-
-export const createAuth = (db: DrizzleClient) =>
+export const createAuth = (db: DrizzleClient): ReturnType<typeof betterAuth> =>
   betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
       schema,
     }),
-    trustedOrigins: [env.WEB_URL, env.API_URL, env.MAIN_URL],
+    ...getAuthConfig(),
     emailAndPassword: {
       enabled: true,
     },
-    session: {
-      cookieCache: {
-        enabled: env.ALCHEMY_STAGE !== "dev",
-        maxAge: 60,
-      },
-    },
-    secondaryStorage: {
-      get: async (key) => {
-        const value = await env.SESSIONS_KV.get(key);
-        return value;
-      },
-      set: async (key, value, ttl) => {
-        if (ttl) {
-          await env.SESSIONS_KV.put(key, value, { expirationTtl: ttl });
-        } else {
-          await env.SESSIONS_KV.put(key, value);
-        }
-      },
-      delete: async (key) => {
-        await env.SESSIONS_KV.delete(key);
-      },
-    },
-    secret: env.AUTH_SECRET,
-    baseURL: env.API_URL,
-    basePath: `/${env.API_PATTERN}/auth`,
-    advanced: {
-      cookiePrefix: customCookiePrefix,
-      defaultCookieAttributes: {
-        sameSite: "none",
-        secure: true,
-        httpOnly: true,
-      },
-      crossSubDomainCookies: {
-        enabled: env.ALCHEMY_STAGE !== "dev",
-        domain: env.MAIN_DOMAIN,
-      },
-    },
-  });
+  } as BetterAuthOptions);
 
 export type BetterAuth = ReturnType<typeof createAuth>;

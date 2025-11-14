@@ -8,11 +8,13 @@ export type CreateContextOptions = {
 };
 
 export async function createContext({ context }: CreateContextOptions) {
-  const auth = createAuth(createDbClient(env.DATABASE.connectionString));
+  const db = createDbClient(env.DATABASE.connectionString);
+  const auth = createAuth(db);
   const session = await auth.api.getSession({
     headers: context.req.raw.headers,
   });
   return {
+    db,
     session,
   };
 }

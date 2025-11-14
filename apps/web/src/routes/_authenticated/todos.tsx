@@ -6,18 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { orpc } from "@/utils/orpc";
+import { apiClient } from "@/integration/api-client";
 
-export const Route = createFileRoute("/todos")({
+export const Route = createFileRoute("/_authenticated/todos")({
   component: TodosRoute,
 });
 
 function TodosRoute() {
   const [newTodoText, setNewTodoText] = useState("");
-
-  const todos = useQuery(orpc.todo.getAll.queryOptions());
+  const todos = useQuery(apiClient.todo.getAll.queryOptions());
   const createMutation = useMutation(
-    orpc.todo.create.mutationOptions({
+    apiClient.todo.create.mutationOptions({
       onSuccess: () => {
         todos.refetch();
         setNewTodoText("");
@@ -25,14 +24,14 @@ function TodosRoute() {
     })
   );
   const toggleMutation = useMutation(
-    orpc.todo.toggle.mutationOptions({
+    apiClient.todo.toggle.mutationOptions({
       onSuccess: () => {
         todos.refetch();
       },
     })
   );
   const deleteMutation = useMutation(
-    orpc.todo.delete.mutationOptions({
+    apiClient.todo.delete.mutationOptions({
       onSuccess: () => {
         todos.refetch();
       },

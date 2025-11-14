@@ -38,7 +38,9 @@
         "noBarrelFile": "off"
       },
       "suspicious": {
-        "useAwait": "off"
+        "useAwait": "off",
+        "noArrayIndexKey": "off",
+        "noExplicitAny": "off"
       },
       "nursery": {
         "noParametersOnlyUsedInRecursion": "off"
@@ -46,7 +48,13 @@
       "style": {
         "noNestedTernary": "off",
         "useConsistentTypeDefinitions": "off",
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "noDescendingSpecificity": "off"
+      },
+      "a11y": {
+        "useSemanticElements": "off",
+        "noNoninteractiveElementInteractions": "off",
+        "useKeyWithClickEvents": "off"
       }
     }
   }
