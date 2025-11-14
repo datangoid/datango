@@ -4,6 +4,21 @@ import * as schema from "@datango/db/schema/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
+let customCookiePrefix: string;
+switch (env.ALCHEMY_STAGE) {
+  case "prod":
+    customCookiePrefix = "datango_";
+    break;
+  case "staging":
+    customCookiePrefix = "datango_staging_";
+    break;
+  case "dev":
+    customCookiePrefix = "datango_dev_";
+    break;
+  default:
+    customCookiePrefix = "datango_preview_";
+}
+
 export const createAuth = (db: DrizzleClient) =>
   betterAuth({
     database: drizzleAdapter(db, {
@@ -16,7 +31,7 @@ export const createAuth = (db: DrizzleClient) =>
     },
     session: {
       cookieCache: {
-        enabled: env.ALCHEMY_STAGE === "prod",
+        enabled: env.ALCHEMY_STAGE !== "dev",
         maxAge: 60,
       },
     },
@@ -40,6 +55,7 @@ export const createAuth = (db: DrizzleClient) =>
     baseURL: env.API_URL,
     basePath: `/${env.API_PATTERN}/auth`,
     advanced: {
+      cookiePrefix: customCookiePrefix,
       defaultCookieAttributes: {
         sameSite: "none",
         secure: true,
