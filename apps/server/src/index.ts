@@ -12,7 +12,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-const app = new Hono<{ Bindings: Env }>().basePath("/v1");
+const app = new Hono<{ Bindings: Env }>().basePath(`/${env.API_PATTERN}`);
 
 const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
@@ -41,7 +41,7 @@ app.use(logger());
 app.use(
   "/*",
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: [env.WEB_URL, env.API_URL, env.MAIN_URL],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization", "User-Agent"],
     exposeHeaders: ["Content-Length"],
@@ -60,7 +60,7 @@ app.on(["POST", "GET"], "/auth/*", (c) => {
 app.use("/*", async (c, next) => {
   const context = await createContext({ context: c });
   const rpcResult = await rpcHandler.handle(c.req.raw, {
-    prefix: "/v1",
+    prefix: `/${env.API_PATTERN}`,
     context,
   });
 
@@ -72,10 +72,10 @@ app.use("/*", async (c, next) => {
 });
 
 // OPENAPI ROUTES
-app.use("/openapi/*", async (c, next) => {
+app.use("/api-reference/*", async (c, next) => {
   const context = await createContext({ context: c });
   const openapiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/v1/openapi",
+    prefix: `/${env.API_PATTERN}/api-reference`,
     context,
   });
 

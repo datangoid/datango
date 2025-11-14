@@ -57,11 +57,16 @@ export const server = await Worker("server", {
     DATABASE: db,
     SESSIONS_KV: sessions,
     ALCHEMY_STAGE: alchemy.env.ALCHEMY_STAGE as string,
-    CORS_ORIGIN: alchemy.env.CORS_ORIGIN as string,
-    BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET as unknown as string,
-    BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL as string,
+    WEB_URL: alchemy.env.WEB_URL as string,
+    API_URL: alchemy.env.API_URL as string,
+    MAIN_URL: alchemy.env.MAIN_URL as string,
+    WEB_DOMAIN: alchemy.env.WEB_DOMAIN as string,
+    API_DOMAIN: alchemy.env.API_DOMAIN as string,
+    MAIN_DOMAIN: alchemy.env.MAIN_DOMAIN as string,
+    API_PATTERN: alchemy.env.API_PATTERN as string,
+    AUTH_SECRET: alchemy.secret.env.AUTH_SECRET as unknown as string,
   },
-  domains: [alchemy.env.API_CUSTOM_DOMAIN as string],
+  domains: [stage === "dev" ? "localhost3000.example" : (alchemy.env.API_DOMAIN as string)],
   dev: {
     port: 3000,
   },
@@ -74,23 +79,23 @@ export const web = await Vite("web", {
   url: false,
   adopt: true,
   bindings: {
-    ALCHEMY_STAGE: alchemy.env.ALCHEMY_STAGE as string,
-    VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL as string,
+    VITE_WEB_DOMAIN: alchemy.env.VITE_WEB_DOMAIN as string,
     VITE_WEB_URL: alchemy.env.VITE_WEB_URL as string,
+    VITE_API_URL: alchemy.env.VITE_API_URL as string,
+    VITE_API_PATTERN: alchemy.env.VITE_API_PATTERN as string,
   },
   dev: {
     command: "bun run dev",
   },
-  domains: [alchemy.env.CUSTOM_WEB_DOMAIN as string],
+  domains: [stage === "dev" ? "localhost3001.example" : (alchemy.env.VITE_WEB_DOMAIN as string)],
 });
-
 if (stage === "prod" || stage === "staging") {
-  const webDomain = alchemy.env.CUSTOM_WEB_DOMAIN as string;
-  const apiPattern = alchemy.env.API_ROUTE_PATTERN as string;
-
+  const webDomain = alchemy.env.WEB_DOMAIN as string;
+  const apiDomain = alchemy.env.API_DOMAIN as string;
+  const apiPattern = alchemy.env.API_PATTERN as string;
   console.log(`\nDeployed to ${stage} via Alchemy:`);
   console.log(`   Web     -> https://${webDomain}`);
-  console.log(`   API     -> https://${apiPattern.replace("/*", "")}`);
+  console.log(`   API     -> https://${apiDomain}/${apiPattern}`);
 }
 
 // Run this to generate wrangler.json files for local development

@@ -10,7 +10,7 @@ export const createAuth = (db: DrizzleClient) =>
       provider: "pg",
       schema,
     }),
-    trustedOrigins: [env.CORS_ORIGIN],
+    trustedOrigins: [env.WEB_URL, env.API_URL, env.MAIN_URL],
     emailAndPassword: {
       enabled: true,
     },
@@ -20,7 +20,6 @@ export const createAuth = (db: DrizzleClient) =>
         maxAge: 60,
       },
     },
-    basePath: "/v1/auth",
     secondaryStorage: {
       get: async (key) => {
         const value = await env.SESSIONS_KV.get(key);
@@ -37,8 +36,9 @@ export const createAuth = (db: DrizzleClient) =>
         await env.SESSIONS_KV.delete(key);
       },
     },
-    secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.BETTER_AUTH_URL,
+    secret: env.AUTH_SECRET,
+    baseURL: env.API_URL,
+    basePath: `/${env.API_PATTERN}/auth`,
     advanced: {
       defaultCookieAttributes: {
         sameSite: "none",
@@ -46,13 +46,8 @@ export const createAuth = (db: DrizzleClient) =>
         httpOnly: true,
       },
       crossSubDomainCookies: {
-        enabled: env.ALCHEMY_STAGE === "prod" || env.ALCHEMY_STAGE === "staging",
-        domain:
-          env.ALCHEMY_STAGE === "prod"
-            ? "app.datango.id"
-            : env.ALCHEMY_STAGE === "staging"
-              ? "staging.app.datango.id"
-              : "preview.app.datango.id",
+        enabled: env.ALCHEMY_STAGE !== "dev",
+        domain: env.MAIN_DOMAIN,
       },
     },
   });

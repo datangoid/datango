@@ -6,8 +6,8 @@ name: Deploy Datango Pull Request
 on:
   pull_request:
     types:
-      - opened      # PR baru dibuat
-      - reopened    # PR yang sudah ditutup dibuka kembali
+      - opened # PR baru dibuat
+      - reopened # PR yang sudah ditutup dibuka kembali
       - synchronize # Ada commit baru di-push ke PR
 
 # Concurrency control: mencegah deployment paralel pada PR yang sama
@@ -19,28 +19,27 @@ jobs:
   deploy-pull-request-job:
     runs-on: ubuntu-latest
     permissions:
-      contents: read      # Baca kode repository
+      contents: read # Baca kode repository
       pull-requests: write # Tulis comment di PR
-    
+
     steps:
       # Step 1: Checkout kode dari PR branch
       - uses: actions/checkout@v4
-      
+
       # Step 2: Setup Bun runtime
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
-      
+
       # Step 3: Install dependencies
       - name: Install dependencies
         run: bun install
-      
+
       # Step 4: Setup tanggal ekspirasi untuk Neon DB branch
       # Preview DB akan otomatis dihapus setelah 3 hari
       - name: Setup Neon DB Expiration Date
         id: neonendate
-        run:
-          echo "EXPIRES_AT=$(date -u --date '+3 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
-      
+        run: echo "EXPIRES_AT=$(date -u --date '+3 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
       # Step 5: Buat database branch khusus untuk PR ini
       # Setiap PR mendapat database terpisah yang di-clone dari 'development' branch
       - name: Create Neon DB Branch for PR
@@ -52,7 +51,7 @@ jobs:
           parent_branch: development
           api_key: ${{ secrets.NEON_API_KEY }}
           expires_at: ${{ steps.neonendate.outputs.EXPIRES_AT }}
-      
+
       # Step 6: Generate URLs dan stage name yang unik untuk PR ini
       # Format: pr-{number}.preview.{app/api}.datango.id
       - name: Set preview variables
@@ -60,18 +59,19 @@ jobs:
         run: |
           PR_NUMBER=${{ github.event.number }}
           echo "stage=pr-${PR_NUMBER}" >> $GITHUB_OUTPUT
-          echo "vite_web_url=https://pr-${PR_NUMBER}.preview.app.datango.id" >> $GITHUB_OUTPUT
-          echo "vite_server_url=https://pr-${PR_NUMBER}.preview.api.datango.id" >> $GITHUB_OUTPUT
-          echo "custom_web_domain=pr-${PR_NUMBER}.preview.app.datango.id" >> $GITHUB_OUTPUT
-          echo "api_custom_domain=pr-${PR_NUMBER}.preview.api.datango.id/v1/*" >> $GITHUB_OUTPUT
-          echo "api_route_pattern=pr-${PR_NUMBER}.preview.api.datango.id/v1/*" >> $GITHUB_OUTPUT
-      
+          echo "web_url=https://app.pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "web_domain=app.pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "api_url=https://api.pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "api_domain=api.pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "main_url=https://pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "main_domain=pr-${PR_NUMBER}.preview.datango.id" >> $GITHUB_OUTPUT
+          echo "api_pattern=v1" >> $GITHUB_OUTPUT
       # Step 7: Buat environment files dengan konfigurasi khusus PR
       # Setiap PR punya environment file sendiri berdasarkan PR number
       - name: Create environment files
         run: |
           STAGE=${{ steps.vars.outputs.stage }}
-          
+
           # Environment file root
           cat > .env.${STAGE} << EOF
           ALCHEMY_STAGE=${STAGE}
@@ -79,26 +79,33 @@ jobs:
 
           # Environment file untuk web app dengan URL preview
           cat > apps/web/.env.${STAGE} << EOF
-          VITE_SERVER_URL=${{ steps.vars.outputs.vite_server_url }}
-          VITE_WEB_URL=${{ steps.vars.outputs.vite_web_url }}
-          CUSTOM_WEB_DOMAIN=${{ steps.vars.outputs.custom_web_domain }}
+          VITE_WEB_URL=${{ steps.vars.outputs.web_url }}
+          VITE_WEB_DOMAIN=${{ steps.vars.outputs.web_domain }}
+          VITE_API_URL=${{ steps.vars.outputs.api_url }}
+          VITE_API_DOMAIN=${{ steps.vars.outputs.api_domain }}
+          VITE_MAIN_URL=${{ steps.vars.outputs.main_url }}
+          VITE_MAIN_DOMAIN=${{ steps.vars.outputs.main_domain }}
+          VITE_API_PATTERN=${{ steps.vars.outputs.api_pattern }}
           EOF
 
           # Environment file untuk server dengan URL preview
           cat > apps/server/.env.${STAGE} << EOF
-          CORS_ORIGIN=${{ steps.vars.outputs.vite_web_url }}
-          BETTER_AUTH_URL=${{ steps.vars.outputs.vite_server_url }}
-          API_CUSTOM_DOMAIN=${{ steps.vars.outputs.api_custom_domain }}
-          API_ROUTE_PATTERN=${{ steps.vars.outputs.api_route_pattern }}
+          MAIN_DOMAIN=${{ steps.vars.outputs.main_domain }}
+          MAIN_URL=${{ steps.vars.outputs.main_url }}
+          API_DOMAIN=${{ steps.vars.outputs.api_domain }}
+          API_URL=${{ steps.vars.outputs.api_url }}
+          WEB_DOMAIN=${{ steps.vars.outputs.web_domain }}
+          WEB_URL=${{ steps.vars.outputs.web_url }}
+          API_PATTERN=${{ steps.vars.outputs.api_pattern }}
           EOF
-      
+
       # Step 8: Deploy preview environment ke Cloudflare
       # Menggunakan DB branch yang baru dibuat
       - name: Deploy PR Preview
         run: bun alchemy deploy --stage ${{ steps.vars.outputs.stage }}
         env:
           DATABASE_URL: ${{steps.create-db-branch.outputs.db_url}}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
           ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -106,27 +113,29 @@ jobs:
           PULL_REQUEST: ${{ github.event.number }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       # Step 9: Posting comment ke PR dengan URL preview
       # Developer bisa langsung klik link untuk test preview
       - name: Comment PR with preview URLs
         uses: actions/github-script@v7
         with:
           script: |
-            const webUrl = '${{ steps.vars.outputs.vite_web_url }}';
-            const serverUrl = '${{ steps.vars.outputs.vite_server_url }}';
-            
+            const mainUrl = '${{ steps.vars.outputs.main_url }}';
+            const webUrl = '${{ steps.vars.outputs.web_url }}';
+            const serverUrl = '${{ steps.vars.outputs.api_url }}';
+
             const comment = `## 🚀 Preview Deployment Ready!
-            
+
             | Environment | URL |
             |-------------|-----|
+            | 🌐 Web Main  | [${mainUrl}](${mainUrl}) |
             | 🌐 Web App  | [${webUrl}](${webUrl}) |
             | 🔧 Web API  | ${serverUrl} |
-            
+
             Preview environment has been deployed successfully.
-            
+
             This preview will be automatically cleaned up when the PR is closed.`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
