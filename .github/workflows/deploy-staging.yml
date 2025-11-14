@@ -38,11 +38,11 @@ jobs:
       # File ini berisi konfigurasi khusus staging yang akan digunakan saat build & deploy
       - name: Create environment files
         run: |
-          cat > .env.prod << EOF
-          ALCHEMY_STAGE=prod
+          cat > .env.staging << EOF
+          ALCHEMY_STAGE=staging
           EOF
 
-          cat > apps/web/.env.prod << EOF
+          cat > apps/web/.env.staging << EOF
           VITE_WEB_URL=${{ vars.WEB_URL }}
           VITE_WEB_DOMAIN=${{ vars.WEB_DOMAIN }}
           VITE_API_URL=${{ vars.API_URL }}
@@ -52,7 +52,7 @@ jobs:
           VITE_API_PATTERN=${{ vars.API_PATTERN }}
           EOF
 
-          cat > apps/server/.env.prod << EOF
+          cat > apps/server/.env.staging << EOF
           MAIN_DOMAIN=${{ vars.MAIN_DOMAIN }}
           MAIN_URL=${{ vars.MAIN_URL }}
           API_DOMAIN=${{ vars.API_DOMAIN }}
