@@ -11,4 +11,4 @@ export function createDbClient(connectionString: string): PostgresJsDatabase<typ
   return drizzle(client, { schema });
 }
 
-export type DrizzleClient = ReturnType<typeof createDbClient>;
+export type CreateDbClient = ReturnType<typeof createDbClient>;

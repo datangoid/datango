@@ -7,9 +7,15 @@
     "nodejs_compat_populate_process_env"
   ],
   "vars": {
-    "STAGE": "dev",
-    "CORS_ORIGIN": "http://localhost:3001",
-    "BETTER_AUTH_URL": "http://localhost:3000"
+    "ALCHEMY_STAGE": "dev",
+    "WEB_URL": "http://localhost:3001",
+    "API_URL": "http://localhost:3000",
+    "MAIN_URL": "http://localhost:3002",
+    "WEB_DOMAIN": "localhost:3001",
+    "API_DOMAIN": "localhost:3000",
+    "MAIN_DOMAIN": "localhost:3002",
+    "API_PATTERN": "v1",
+    "AUTH_SECRET": "nCVV8CGYrm8qEhVWZXqUQxFmLJrXiaYf"
   },
   "kv_namespaces": [
     {

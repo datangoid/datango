@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import z from "zod";
 import { publicProcedure } from "../index";
 
-export const todoRouter: any = {
+export const todoRouter = {
   getAll: publicProcedure.handler(async ({ context }) => context.db.select().from(todo)),
 
   create: publicProcedure

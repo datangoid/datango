@@ -9,8 +9,8 @@ export const getAuthConfig = (): Partial<BetterAuthOptions> => ({
   advanced: {
     cookiePrefix: getCookiePrefix(),
     defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
+      sameSite: env.ALCHEMY_STAGE === "dev" ? "lax" : "none",
+      secure: env.ALCHEMY_STAGE !== "dev",
       httpOnly: true,
     },
     crossSubDomainCookies: {
