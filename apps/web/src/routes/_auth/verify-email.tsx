@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import VerifyEmail from "@/features/auth/verify-email";
@@ -10,6 +10,11 @@ export const Route = createFileRoute("/_auth/verify-email")({
       email: z.email(),
     })
   ),
+  beforeLoad: ({ context, search }) => {
+    if (context.authData) {
+      throw redirect({ to: search.redirect || "/" });
+    }
+  },
   component: RouteComponent,
 });
 

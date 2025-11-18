@@ -9,6 +9,7 @@ import {
   twoFactorClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { queryClient } from "./query-client";
 
 export const authClient = createAuthClient({
   baseURL: `${import.meta.env.VITE_API_URL}/${import.meta.env.VITE_API_PATTERN}/auth`,
@@ -51,3 +52,21 @@ export const authClient = createAuthClient({
     }),
   ],
 });
+
+export const { getSession } = authClient;
+
+const SESSION_QUERY_KEY = ["auth", "session"] as const;
+
+export async function getSessionQuery() {
+  return await queryClient.ensureQueryData({
+    queryKey: SESSION_QUERY_KEY,
+    queryFn: async () => await getSession(),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}
+
+export async function refetchSessionQuery() {
+  await queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
+  return queryClient.refetchQueries({ queryKey: SESSION_QUERY_KEY });
+}

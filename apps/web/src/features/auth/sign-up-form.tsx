@@ -94,7 +94,7 @@ export function SignUpForm({ search }: { search: { redirect?: string } }) {
       </form>
       <AuthFooter>
         Already have an account?
-        <Link className="ml-1 text-primary" to="/sign-in" viewTransition>
+        <Link className="ml-1 text-primary" preload={false} to="/sign-in" viewTransition>
           Sign In
         </Link>
       </AuthFooter>

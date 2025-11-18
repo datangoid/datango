@@ -3,7 +3,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { authClient } from "@/integration/auth-client";
+import { authClient, refetchSessionQuery } from "@/integration/auth-client";
 import { AuthTitle } from "./components/auth-title";
 
 export default function VerifyEmail({ search }: { search: { redirect?: string; email: string } }) {
@@ -21,7 +21,8 @@ export default function VerifyEmail({ search }: { search: { redirect?: string; e
       await authClient.emailOtp.verifyEmail(
         { email: search.email, otp },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            await refetchSessionQuery();
             navigate({
               to: search.redirect || "/",
             });

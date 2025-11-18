@@ -3,7 +3,7 @@ import React from "react";
 import { ErrorBoundary } from "@/components/root/error-boundary";
 import { NotFound } from "@/components/root/not-found";
 import { Toaster } from "@/components/ui/sonner";
-import { authClient } from "@/integration/auth-client";
+import { getSessionQuery } from "@/integration/auth-client";
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
@@ -14,12 +14,9 @@ export const Route = createRootRoute({
         href: "https://datango.id",
       });
     }
-
-    // Fetch user session globally
-    const { data: authData } = await authClient.getSession();
-
+    const authData = await getSessionQuery();
     return {
-      authData,
+      authData: authData.data,
     };
   },
   component: RootComponent,
@@ -47,9 +44,7 @@ function RootComponent() {
   return (
     <>
       <Toaster />
-      <div className="p-2 md:p-4">
-        <Outlet />
-      </div>
+      <Outlet />
       <React.Suspense>
         <TanStackRouterDevtools position="bottom-right" />
       </React.Suspense>

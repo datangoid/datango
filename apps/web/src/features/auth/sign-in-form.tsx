@@ -1,9 +1,11 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
 import { FormButton } from "@/components/form/form-button";
 import { useAppForm } from "@/components/form/form-hooks";
-import { authClient } from "@/integration/auth-client";
+import { InputGroupAddon } from "@/components/ui/input-group";
+import { authClient, refetchSessionQuery } from "@/integration/auth-client";
 import { AuthFooter } from "./components/auth-footer";
 import { AuthTitle } from "./components/auth-title";
 
@@ -18,6 +20,7 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
   const navigate = useNavigate({
     from: "/sign-in",
   });
+  const router = useRouter();
 
   const form = useAppForm({
     formId: "sign-in-form",
@@ -31,7 +34,9 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
     },
     onSubmit: async ({ value }) => {
       await authClient.signIn.email(value, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await refetchSessionQuery();
+          await router.invalidate();
           navigate({
             to: search.redirect || "/",
           });
@@ -56,7 +61,7 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
     <>
       <AuthTitle>Welcome back</AuthTitle>
       <form
-        className="space-y-4"
+        className="space-y-6"
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -64,7 +69,19 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
         }}
       >
         <form.AppField name="email">
-          {(field) => <field.Input autoComplete="email" isRequired label="Email" type="email" />}
+          {(field) => (
+            <field.Input
+              autoComplete="email"
+              isRequired
+              label="Email"
+              placeholder="john@example.com"
+              type="email"
+            >
+              <InputGroupAddon>
+                <Mail />
+              </InputGroupAddon>
+            </field.Input>
+          )}
         </form.AppField>
         <form.AppField name="password">
           {(field) => (
@@ -72,8 +89,13 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
               autoComplete="current-password"
               isRequired
               label="Password"
+              placeholder="Enter your password"
               secondaryLabel={secondaryLabel}
-            />
+            >
+              <InputGroupAddon>
+                <Lock />
+              </InputGroupAddon>
+            </field.Password>
           )}
         </form.AppField>
         <form.AppField name="rememberMe">
@@ -93,7 +115,7 @@ export function SignInForm({ search }: { search: { redirect?: string } }) {
       </form>
       <AuthFooter>
         Need an account?
-        <Link className="ml-1 text-primary" to="/sign-up" viewTransition>
+        <Link className="ml-1 text-primary" preload={false} to="/sign-up" viewTransition>
           Sign Up
         </Link>
       </AuthFooter>
