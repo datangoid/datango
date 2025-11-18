@@ -43,7 +43,8 @@
         "noExplicitAny": "off"
       },
       "nursery": {
-        "noParametersOnlyUsedInRecursion": "off"
+        "noParametersOnlyUsedInRecursion": "off",
+        "noShadow": "off"
       },
       "style": {
         "noNestedTernary": "off",
@@ -54,7 +55,9 @@
       "a11y": {
         "useSemanticElements": "off",
         "noNoninteractiveElementInteractions": "off",
-        "useKeyWithClickEvents": "off"
+        "useKeyWithClickEvents": "off",
+        "useFocusableInteractive": "off",
+        "useAriaPropsForRole": "off"
       }
     }
   }

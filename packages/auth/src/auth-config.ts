@@ -1,13 +1,14 @@
-import { env } from "cloudflare:workers";
 import type { BetterAuthOptions } from "better-auth";
+import type { CloudflareEnv } from "../env";
 
-export const getAuthConfig = (): Partial<BetterAuthOptions> => ({
+export const getAuthConfig = (env: CloudflareEnv): Partial<BetterAuthOptions> => ({
+  appName: "Datango",
   trustedOrigins: [env.WEB_URL, env.API_URL, env.MAIN_URL],
   secret: env.AUTH_SECRET,
   baseURL: env.API_URL,
   basePath: `/${env.API_PATTERN}/auth`,
   advanced: {
-    cookiePrefix: getCookiePrefix(),
+    cookiePrefix: getCookiePrefix(env),
     defaultCookieAttributes: {
       sameSite: env.ALCHEMY_STAGE === "dev" ? "lax" : "none",
       secure: env.ALCHEMY_STAGE !== "dev",
@@ -42,7 +43,7 @@ export const getAuthConfig = (): Partial<BetterAuthOptions> => ({
   },
 });
 
-const getCookiePrefix = (): string => {
+const getCookiePrefix = (env: CloudflareEnv): string => {
   switch (env.ALCHEMY_STAGE) {
     case "prod":
       return "datango_";

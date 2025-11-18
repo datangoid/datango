@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface LoginSearch {
   redirect?: string;
@@ -19,7 +20,11 @@ export const Route = createFileRoute("/_auth")({
 function Layout() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Outlet />
+      <Card className="flex w-full max-w-md flex-col">
+        <CardContent className="flex w-full flex-col">
+          <Outlet />
+        </CardContent>
+      </Card>
     </div>
   );
 }

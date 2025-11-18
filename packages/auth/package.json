@@ -8,6 +8,10 @@
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./src/*.ts"
+    },
+    "./permissions": {
+      "types": "./dist/auth-permissions.d.ts",
+      "default": "./src/auth-permissions.ts"
     }
   },
   "type": "module",

@@ -58,7 +58,10 @@ app.on(["POST", "GET"], "/auth/*", (c) => {
 
 // RPC ROUTES
 app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
+  const context = await createContext({
+    context: c,
+    db: createDbClient(env.DATABASE.connectionString),
+  });
   const rpcResult = await rpcHandler.handle(c.req.raw, {
     prefix: `/${env.API_PATTERN}`,
     context,
@@ -73,7 +76,10 @@ app.use("/*", async (c, next) => {
 
 // OPENAPI ROUTES
 app.use("/api-reference/*", async (c, next) => {
-  const context = await createContext({ context: c });
+  const context = await createContext({
+    context: c,
+    db: createDbClient(env.DATABASE.connectionString),
+  });
   const openapiResult = await apiHandler.handle(c.req.raw, {
     prefix: `/${env.API_PATTERN}/api-reference`,
     context,

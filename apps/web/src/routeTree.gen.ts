@@ -15,8 +15,10 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTodosRouteImport } from './routes/_authenticated/todos'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
+import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
-import { Route as AuthAuthRouteImport } from './routes/_auth/auth'
 import { Route as Auth2faRouteImport } from './routes/_auth/2fa'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -47,14 +49,24 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthSignInRoute = AuthSignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthAuthRoute = AuthAuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const Auth2faRoute = Auth2faRouteImport.update({
@@ -65,8 +77,10 @@ const Auth2faRoute = Auth2faRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/2fa': typeof Auth2faRoute
-  '/auth': typeof AuthAuthRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/todos': typeof AuthenticatedTodosRoute
@@ -74,8 +88,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/2fa': typeof Auth2faRoute
-  '/auth': typeof AuthAuthRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/sign-in': typeof AuthSignInRoute
+  '/sign-up': typeof AuthSignUpRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/home': typeof AuthenticatedHomeRoute
   '/todos': typeof AuthenticatedTodosRoute
@@ -86,8 +102,10 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_auth/2fa': typeof Auth2faRoute
-  '/_auth/auth': typeof AuthAuthRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_auth/sign-in': typeof AuthSignInRoute
+  '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_auth/verify-email': typeof AuthVerifyEmailRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/todos': typeof AuthenticatedTodosRoute
@@ -97,8 +115,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/2fa'
-    | '/auth'
     | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/verify-email'
     | '/dashboard'
     | '/home'
     | '/todos'
@@ -106,8 +126,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/2fa'
-    | '/auth'
     | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/verify-email'
     | '/dashboard'
     | '/home'
     | '/todos'
@@ -117,8 +139,10 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_authenticated'
     | '/_auth/2fa'
-    | '/_auth/auth'
     | '/_auth/reset-password'
+    | '/_auth/sign-in'
+    | '/_auth/sign-up'
+    | '/_auth/verify-email'
     | '/_authenticated/dashboard'
     | '/_authenticated/home'
     | '/_authenticated/todos'
@@ -174,18 +198,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_auth/verify-email': {
+      id: '/_auth/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/sign-up': {
+      id: '/_auth/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/sign-in': {
+      id: '/_auth/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/auth': {
-      id: '/_auth/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthAuthRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/2fa': {
@@ -200,14 +238,18 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteRouteChildren {
   Auth2faRoute: typeof Auth2faRoute
-  AuthAuthRoute: typeof AuthAuthRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   Auth2faRoute: Auth2faRoute,
-  AuthAuthRoute: AuthAuthRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
 }
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(

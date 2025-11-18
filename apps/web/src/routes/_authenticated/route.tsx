@@ -5,7 +5,8 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context }) => {
     if (!context.authData) {
       throw redirect({
-        to: "/auth",
+        to: "/sign-in",
+        search: { redirect: window.location.pathname },
       });
     }
   },
