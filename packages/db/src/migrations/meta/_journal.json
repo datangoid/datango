@@ -15,6 +15,13 @@
       "when": 1763446274389,
       "tag": "0001_long_norman_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763446632751,
+      "tag": "0002_smiling_jubilee",
+      "breakpoints": true
     }
   ]
 }
