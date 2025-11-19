@@ -30,15 +30,12 @@
     "format:unsafe": "biome format --write --unsafe .",
     "check": "bun run lint && bun run format",
     "check-types": "turbo check-types",
-
     "adev": "alchemy dev --env-file .env.dev",
     "aclean": "rm -rf .alchemy && turbo aclean",
-
     "build": "turbo build",
     "dev": "turbo dev",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
-
     "db:start": "turbo -F @datango/db db:start",
     "db:push": "turbo -F @datango/db db:push",
     "db:studio": "turbo -F @datango/db db:studio",
@@ -46,6 +43,7 @@
     "db:migrate": "turbo -F @datango/db db:migrate"
   },
   "dependencies": {
+    "better-auth": "https://pkg.pr.new/better-auth/better-auth@6092",
     "dotenv": "^17.2.2",
     "zod": "^4.1.11"
   },
