@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_auth")({
 
 function Layout() {
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col bg-radial from-foreground/5 to-background">
       <header className="fixed inset-x-0 top-0 z-50 flex select-none justify-center">
         <div className="mx-auto w-full max-w-7xl rounded-b-2xl bg-sidebar px-4 shadow-sm md:px-8">
           <nav className="flex items-center justify-between py-2">
@@ -44,7 +44,7 @@ function Layout() {
           </Card>
         </div>
       </main>
-      <footer className="z-10 m-auto w-full max-w-7xl rounded-t-2xl bg-sidebar py-[7px] text-center text-muted-foreground text-sm shadow-sm">
+      <footer className="z-10 m-auto w-full max-w-7xl rounded-t-2xl bg-sidebar py-[7px] text-center text-muted-foreground text-xs shadow-sm">
         © 2025 <a href="https://datango.id">Datango</a>. All rights reserved.
       </footer>
     </div>

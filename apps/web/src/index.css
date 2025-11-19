@@ -254,6 +254,18 @@
     @apply border-border outline-ring/50;
   }
   body {
+    @apply bg-background text-foreground antialiased min-h-screen relative;
+  }
+}
+#app {
+  @apply relative w-full h-full min-h-screen;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
     @apply bg-background text-foreground;
   }
 }

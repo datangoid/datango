@@ -49,7 +49,7 @@ function RootComponent() {
         <TanStackRouterDevtools position="bottom-right" />
       </React.Suspense>
       <React.Suspense>
-        <TanStackQueryDevtools buttonPosition="bottom-left" />
+        <TanStackQueryDevtools buttonPosition="bottom-right" />
       </React.Suspense>
     </>
   );
